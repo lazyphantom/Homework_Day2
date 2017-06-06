@@ -9,42 +9,87 @@ namespace PotterShoppingCart
     public class ShoppingCart
     {
         List<Product> productsOfCart;
-        BookPrice bookPrice = new BookPrice();
+        BookPrice bookPrice;
         public ShoppingCart()
         {
             productsOfCart = new List<Product>();
+            bookPrice = new BookPrice();
         }
 
-        public void Add(string bookName, int amouint)
+        public void Add(string bookName, int amount)
         {
-            productsOfCart.Add(new Product(bookName, bookPrice.GetPriceByBookname(bookName), amouint));
+            productsOfCart.Add(new Product(bookName, bookPrice.GetPriceByBookname(bookName), amount));
         }
 
-        public int CalculatePrice()
+        public double CalculatePrice()
         {
+            double totalPrice = 0;
             int temp = 0;
-            foreach (var product in productsOfCart)
+
+            while (true)
             {
-                temp += product.Amouint * product.Price;
+                var inCart = from p in productsOfCart
+                             where p.Amount > 0
+                             select p;
+
+                if (inCart.Count() != 0)
+                {
+                    int minAmount = (from p in inCart
+                                     where p.Amount > 0
+                                     select p.Amount).Min();
+                    foreach (var a in inCart)
+                    {
+                        temp += a.Price * minAmount;
+                    }
+                    totalPrice += temp * GetDiscount(inCart.Count());
+                    temp = 0;
+                    foreach (var p in productsOfCart)
+                    {
+                        p.Amount -= minAmount;
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
-            return temp;
+
+            return totalPrice;
+        }
+
+        private double GetDiscount(int count)
+        {
+            switch (count)
+            {
+                case 2:
+                    return 0.95;
+                case 3:
+                    return 0.9;
+                case 4:
+                    return 0.8;
+                case 5:
+                    return 0.75;
+                default:
+                    return 1;
+            }
         }
     }
 
     internal class Product
     {
-        public int Amouint { get; private set; }
-        public string Name { get; private set; }
-        public int Price { get; private set; }
+        public int Amount { get; set; }
+        public string Name { get; set; }
+        public int Price { get; set; }
 
-        public Product(string Name, int Price, int Amouint)
+        public Product(string Name, int Price, int Amount)
         {
             this.Name = Name;
             this.Price = Price;
-            this.Amouint = Amouint;
+            this.Amount = Amount;
         }
     }
-    public class BookPrice
+
+    internal class BookPrice
     {
         private Dictionary<string, int> BookPriceDictionary;
 
@@ -68,6 +113,5 @@ namespace PotterShoppingCart
                 return 0;
             }
         }
-
     }
 }
