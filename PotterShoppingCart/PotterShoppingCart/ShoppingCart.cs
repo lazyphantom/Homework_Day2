@@ -8,20 +8,11 @@ namespace PotterShoppingCart
 {
     public class ShoppingCart
     {
-        List<Product> productsOfCart;
-        BookPrice bookPrice;
         public ShoppingCart()
         {
-            productsOfCart = new List<Product>();
-            bookPrice = new BookPrice();
         }
 
-        public void Add(string bookName, int amount)
-        {
-            productsOfCart.Add(new Product(bookName, bookPrice.GetPriceByBookname(bookName), amount));
-        }
-
-        public double CalculatePrice()
+        public double CalculatePrice(List<Product> productsOfCart)
         {
             double totalPrice = 0;
             int temp = 0;
@@ -75,7 +66,7 @@ namespace PotterShoppingCart
         }
     }
 
-    internal class Product
+    public class Product
     {
         public int Amount { get; set; }
         public string Name { get; set; }
@@ -86,32 +77,6 @@ namespace PotterShoppingCart
             this.Name = Name;
             this.Price = Price;
             this.Amount = Amount;
-        }
-    }
-
-    internal class BookPrice
-    {
-        private Dictionary<string, int> BookPriceDictionary;
-
-        public BookPrice()
-        {
-            BookPriceDictionary = new Dictionary<string, int>();
-            BookPriceDictionary.Add("Harry Potter 1", 100);
-            BookPriceDictionary.Add("Harry Potter 2", 100);
-            BookPriceDictionary.Add("Harry Potter 3", 100);
-            BookPriceDictionary.Add("Harry Potter 4", 100);
-            BookPriceDictionary.Add("Harry Potter 5", 100);
-        }
-        public int GetPriceByBookname(String name)
-        {
-            if (true == (BookPriceDictionary.ContainsKey(name)))
-            {
-                return BookPriceDictionary[name];
-            }
-            else
-            {
-                return 0;
-            }
         }
     }
 }
